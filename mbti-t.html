@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MBTI 여행지 추천</title>
+    <style>
+        /* CSS 스타일링 */
+        :root {
+            --primary: #6366f1;
+            --secondary: #a855f7;
+            --bg: #f8fafc;
+            --text: #1e293b;
+        }
+
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+            background: linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            color: var(--text);
+        }
+
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 24px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            width: 90%;
+            max-width: 420px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p.subtitle {
+            color: #64748b;
+            margin-bottom: 2rem;
+        }
+
+        select {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            outline: none;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        select:focus {
+            border-color: var(--primary);
+        }
+
+        button {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        /* 결과 화면 스타일 */
+        #result {
+            display: none; /* 초기에는 숨김 */
+            margin-top: 2rem;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 2rem;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .img-container {
+            width: 100%;
+            height: 250px;
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+            background-color: #eee;
+        }
+
+        .img-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .img-container:hover img {
+            transform: scale(1.05);
+        }
+
+        .destination {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .desc {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #475569;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>✈️ MBTI 여행지 추천</h1>
+        <p class="subtitle">당신의 성향에 딱 맞는 여행지는 어디일까요?</p>
+
+        <select id="mbti">
+            <option value="" disabled selected>MBTI를 선택해주세요</option>
+            <option value="ISTJ">ISTJ - 청렴결백한 논리주의자</option>
+            <option value="ISFJ">ISFJ - 용감한 수호자</option>
+            <option value="INFJ">INFJ - 통찰력 있는 선지자</option>
+            <option value="INTJ">INTJ - 용의주도한 전략가</option>
+            <option value="ISTP">ISTP - 만능 재주꾼</option>
+            <option value="ISFP">ISFP - 호기심 많은 예술가</option>
+            <option value="INFP">INFP - 열정적인 중재자</option>
+            <option value="INTP">INTP - 논리적인 사색가</option>
+            <option value="ESTP">ESTP - 모험을 즐기는 사업가</option>
+            <option value="ESFP">ESFP - 자유로운 영혼의 연예인</option>
+            <option value="ENFP">ENFP - 재기발랄한 활동가</option>
+            <option value="ENTP">ENTP - 뜨거운 논쟁을 즐기는 변론가</option>
+            <option value="ESTJ">ESTJ - 엄격한 관리자</option>
+            <option value="ESFJ">ESFJ - 사교적인 외교관</option>
+            <option value="ENFJ">ENFJ - 정의로운 사회운동가</option>
+            <option value="ENTJ">ENTJ - 대담한 통솔자</option>
+        </select>
+
+        <button onclick="showRecommendation()">추천받기</button>
+
+        <div id="result">
+            <div class="img-container">
+                <img id="result-img" src="" alt="여행지 이미지">
+            </div>
+            <div class="destination" id="result-dest"></div>
+            <div class="desc" id="result-desc"></div>
+        </div>
+    </div>
+
+    <script>
+        // 데이터: MBTI별 여행지와 이미지 URL (Unsplash 이미지 사용)
+        const data = {
+            ISTJ: { place: "독일 베를린", desc: "체계적이고 역사적인 도시에서 깊이 있는 여행을 즐겨보세요.", img: "https://images.unsplash.com/photo-1560969184-10fe8719e047?auto=format&fit=crop&w=800&q=80" },
+            ISFJ: { place: "일본 교토", desc: "고즈넉한 사찰과 전통적인 분위기 속에서 힐링하세요.", img: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=800&q=80" },
+            INFJ: { place: "아이슬란드", desc: "신비로운 오로라와 대자연 속에서 영감을 얻어보세요.", img: "https://images.unsplash.com/photo-1476610182048-b716b8518aae?auto=format&fit=crop&w=800&q=80" },
+            INTJ: { place: "영국 런던", desc: "지적 호기심을 채워줄 박물관과 역사가 가득한 곳입니다.", img: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=800&q=80" },
+            ISTP: { place: "몽골", desc: "광활한 초원에서 자유롭게 모험을 즐겨보세요.", img: "https://images.unsplash.com/photo-1533240332313-0db49b459ad6?auto=format&fit=crop&w=800&q=80" },
+            ISFP: { place: "스위스 인터라켄", desc: "그림 같은 풍경 속에서 예술적 감성을 충전하세요.", img: "https://images.unsplash.com/photo-1530122037265-a5f1f91d3b99?auto=format&fit=crop&w=800&q=80" },
+            INFP: { place: "프랑스 파리", desc: "낭만과 예술이 숨 쉬는 도시에서 꿈같은 시간을 보내세요.", img: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=800&q=80" },
+            INTP: { place: "이집트 카이로", desc: "고대 문명의 미스터리를 탐구하는 지적인 여행을 떠나보세요.", img: "https://images.unsplash.com/photo-1572252009286-268acec5ca0a?auto=format&fit=crop&w=800&q=80" },
+            ESTP: { place: "미국 라스베이거스", desc: "화려한 불빛과 끊임없는 액티비티가 당신을 기다립니다.", img: "https://images.unsplash.com/photo-1605833556294-ea5c7a74f57d?auto=format&fit=crop&w=800&q=80" },
+            ESFP: { place: "스페인 이비자", desc: "열정적인 파티와 아름다운 해변에서 에너지를 발산하세요.", img: "https://images.unsplash.com/photo-1563789031959-4c02bcb41319?auto=format&fit=crop&w=800&q=80" },
+            ENFP: { place: "태국 방콕", desc: "활기찬 거리와 새로운 만남이 가득한 배낭여행의 성지입니다.", img: "https://images.unsplash.com/photo-1508009603885-50cf7c579365?auto=format&fit=crop&w=800&q=80" },
+            ENTP: { place: "미국 샌프란시스코", desc: "혁신과 자유로움이 공존하는 도시에서 영감을 얻으세요.", img: "https://images.unsplash.com/photo-1501594907352-04cda38ebc29?auto=format&fit=crop&w=800&q=80" },
+            ESTJ: { place: "싱가포르", desc: "깨끗하고 체계적인 도시에서 효율적이고 럭셔리한 여행을 즐기세요.", img: "https://images.unsplash.com/photo-1525625293386-3f8f99389edd?auto=format&fit=crop&w=800&q=80" },
+            ESFJ: { place: "베트남 다낭", desc: "친절한 사람들과 맛있는 음식, 가족과 함께하기 좋은 휴양지입니다.", img: "https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=800&q=80" },
+            ENFJ: { place: "이탈리아 피렌체", desc: "사람과 예술을 사랑하는 당신에게 르네상스의 본고장을 추천합니다.", img: "https://images.unsplash.com/photo-1543429776-27727e242d33?auto=format&fit=crop&w=800&q=80" },
+            ENTJ: { place: "미국 뉴욕", desc: "세계의 중심에서 당신의 야망과 에너지를 확인해보세요.", img: "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?auto=format&fit=crop&w=800&q=80" }
+        };
+
+        function showRecommendation() {
+            const mbtiSelect = document.getElementById('mbti');
+            const selectedValue = mbtiSelect.value;
+            const resultDiv = document.getElementById('result');
+            const resultImg = document.getElementById('result-img');
+            const resultDest = document.getElementById('result-dest');
+            const resultDesc = document.getElementById('result-desc');
+
+            if (!selectedValue) {
+                alert('MBTI를 선택해주세요!');
+                return;
+            }
+
+            const info = data[selectedValue];
+
+            // 결과 내용 업데이트
+            resultDest.innerText = info.place;
+            resultDesc.innerText = info.desc;
+            resultImg.src = info.img;
+
+            // 결과창 표시
+            resultDiv.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
